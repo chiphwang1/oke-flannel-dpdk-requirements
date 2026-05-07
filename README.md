@@ -35,6 +35,8 @@ Required or commonly needed plugins:
 | `host-local` | Provides local IP address management for CNI networks that need IP allocation. The DPDK `host-device` path can use `ipam: {}`, but this plugin is still commonly expected. |
 | `loopback` | Sets up the pod loopback interface. Standard CNI installations normally include it. |
 | `portmap` | Supports hostPort-style mappings for CNI-managed pods. |
+| `tuning` | Commonly bundled with the standard CNI plugins and useful when a CNI attachment needs sysctl or interface tuning. Installed by the validated DaemonSet for completeness. |
+| `firewall` | Commonly bundled with the standard CNI plugins and useful for CNI-managed firewall behavior. Installed by the validated DaemonSet for completeness. |
 
 Minimal installer DaemonSet:
 
@@ -171,6 +173,8 @@ Why these are needed:
 | `NET_ADMIN` | Allows network interface operations inside the pod network namespace. |
 | `NET_RAW` | Allows raw packet operations. Useful for low-level packet tools and some network paths. |
 
+When `privileged: true` is set, Kubernetes already grants these capabilities. They are listed to show the access the validated test expected and to help derive a narrower security context for production.
+
 Required host device mounts:
 
 ```yaml
@@ -190,7 +194,7 @@ Why these are needed:
 | --- | --- |
 | `/dev/infiniband` | Required by the Mellanox userspace verbs stack used by the DPDK `mlx5` PMD. |
 
-`/dev/vfio` is not required for the working Mellanox `mlx5_core` path. Add it only if your workload uses a true `vfio-pci` model and the NIC is intentionally bound to `vfio-pci`.
+`/dev/vfio` is not expected to be required for the working Mellanox `mlx5_core` path. The validated Flannel manifest mounted it during testing, so remove it only after confirming your workload still initializes the DPDK port without it. Add it deliberately if your workload uses a true `vfio-pci` model and the NIC is intentionally bound to `vfio-pci`.
 
 ## Required Pod Packages
 
@@ -323,6 +327,8 @@ Keep the Kubernetes pod settings the same:
 ## Hugepage Requirements
 
 The minimal working test above uses `--no-huge`.
+
+That is the only DPDK path validated on the Flannel cluster in this run. Hugepage-backed DPDK was validated on the VCN-native cluster, but not yet on this Flannel node pool.
 
 If your DPDK application requires hugepages, the worker node must expose hugepage capacity to Kubernetes before the pod is scheduled.
 
