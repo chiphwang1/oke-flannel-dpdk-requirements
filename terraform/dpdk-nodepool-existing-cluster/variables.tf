@@ -42,6 +42,17 @@ variable "node_count" {
   default     = 1
 }
 
+variable "max_pods_per_node" {
+  description = "Maximum number of Kubernetes pods OKE should allow per worker node in this flannel node pool. This is node capacity, not the number of DPDK host-device test pods."
+  type        = number
+  default     = 31
+
+  validation {
+    condition     = var.max_pods_per_node > 0
+    error_message = "max_pods_per_node must be greater than 0."
+  }
+}
+
 variable "node_shape" {
   description = "Compute shape for the DPDK validation node pool."
   type        = string

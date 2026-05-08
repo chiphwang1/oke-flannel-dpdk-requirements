@@ -57,7 +57,8 @@ resource "oci_containerengine_node_pool" "dpdk" {
     }
 
     node_pool_pod_network_option_details {
-      cni_type = "FLANNEL_OVERLAY"
+      cni_type          = "FLANNEL_OVERLAY"
+      max_pods_per_node = var.max_pods_per_node
     }
   }
 
