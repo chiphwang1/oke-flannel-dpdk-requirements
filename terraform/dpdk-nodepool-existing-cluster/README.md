@@ -37,7 +37,7 @@ Edit `terraform.tfvars` with the existing flannel cluster OCID, compartment OCID
 | `kubernetes_version` | Yes | none | Kubernetes version for the new node pool. It must be compatible with the existing cluster. |
 | `node_pool_name` | No | `dpdk-hugepages` | Name assigned to the new DPDK validation node pool and used as the default node-label value. |
 | `node_count` | No | `1` | Number of worker nodes to create in the node pool. |
-| `max_pods_per_node` | No | `31` | Maximum Kubernetes pod capacity per worker node for this flannel node pool. This is not the number of DPDK test pods; a single host-device PCI attachment cannot be shared by multiple pods at the same time. |
+| `max_pods_per_node` | No | `110` | Maximum Kubernetes pod capacity per worker node for this flannel node pool. This is not the number of DPDK test pods; a single host-device PCI attachment cannot be shared by multiple pods at the same time. |
 | `node_shape` | No | `VM.Standard.E5.Flex` | Compute shape for each worker node. |
 | `ocpus` | No | `4` | OCPU count for flexible shapes. |
 | `memory_in_gbs` | No | `32` | Memory size for flexible shapes. Leave enough memory for the hugepages reserved by cloud-init. |

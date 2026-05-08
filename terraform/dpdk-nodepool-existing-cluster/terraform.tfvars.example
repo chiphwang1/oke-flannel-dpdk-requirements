@@ -10,7 +10,7 @@ kubernetes_version = "v1.35.2"
 
 node_pool_name = "dpdk-hugepages"
 node_count     = 1
-max_pods_per_node = 31
+max_pods_per_node = 110
 node_shape     = "VM.Standard.E5.Flex"
 ocpus          = 4
 memory_in_gbs  = 32
