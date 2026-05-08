@@ -73,20 +73,20 @@ data "oci_containerengine_node_pool" "dpdk" {
 }
 
 locals {
-  worker_instance_ids = toset([
+  worker_instance_ids = [
     for node in data.oci_containerengine_node_pool.dpdk.nodes : node.id
-  ])
+  ]
 }
 
 resource "oci_core_vnic_attachment" "secondary" {
-  for_each = var.attach_secondary_vnic ? local.worker_instance_ids : []
+  count = var.attach_secondary_vnic ? var.node_count : 0
 
-  instance_id  = each.key
-  display_name = "${var.secondary_vnic_display_name_prefix}-attachment"
+  instance_id  = local.worker_instance_ids[count.index]
+  display_name = "${var.secondary_vnic_display_name_prefix}-${count.index + 1}-attachment"
 
   create_vnic_details {
     subnet_id              = var.secondary_vnic_subnet_id
-    display_name           = var.secondary_vnic_display_name_prefix
+    display_name           = "${var.secondary_vnic_display_name_prefix}-${count.index + 1}"
     assign_public_ip       = var.secondary_vnic_assign_public_ip
     skip_source_dest_check = var.secondary_vnic_skip_source_dest_check
     nsg_ids                = var.secondary_vnic_nsg_ids

@@ -92,6 +92,16 @@ lspci -nnk | egrep -A3 'Mellanox|Ethernet'
 dpdk-devbind.py -s
 ```
 
+Install Multus before applying the rendered `host-device` test:
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/master/deployments/multus-daemonset-thick.yml
+kubectl -n kube-system rollout status daemonset/kube-multus-ds --timeout=180s
+kubectl -n kube-system get pods -l app=multus -o wide
+```
+
+Also make sure the target worker has the standard CNI plugins, especially `host-device`, under `/opt/cni/bin`. The root README contains a minimal installer DaemonSet for `bridge`, `host-device`, `host-local`, `loopback`, `portmap`, `tuning`, and `firewall`.
+
 Apply the read-only smoke test first:
 
 ```bash

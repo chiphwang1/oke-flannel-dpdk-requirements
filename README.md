@@ -28,6 +28,26 @@ The worker node must have:
 
 Do not bind the secondary VNIC to `vfio-pci` for this working path. The validated path uses Mellanox `mlx5_core` plus the DPDK `mlx5` PMD.
 
+## Install Multus
+
+Install Multus before applying any pod that references `k8s.v1.cni.cncf.io/networks`.
+
+Validated install command:
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/master/deployments/multus-daemonset-thick.yml
+kubectl -n kube-system rollout status daemonset/kube-multus-ds --timeout=180s
+```
+
+Verify it is running on the target nodes:
+
+```bash
+kubectl -n kube-system get pods -l app=multus -o wide
+kubectl -n kube-system get daemonset kube-multus-ds
+```
+
+After Multus is running, install the standard CNI plugins listed below so `host-device` and the default-network helper plugins exist under `/opt/cni/bin` on each worker.
+
 ## Required Node CNI Plugins
 
 These binaries must exist on each target worker under:

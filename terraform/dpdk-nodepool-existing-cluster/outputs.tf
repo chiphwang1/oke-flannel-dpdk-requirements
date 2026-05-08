@@ -15,7 +15,7 @@ output "node_selector" {
 
 output "worker_instance_ids" {
   description = "Compute instance OCIDs for nodes in the created node pool."
-  value       = sort(tolist(local.worker_instance_ids))
+  value       = sort(local.worker_instance_ids)
 }
 
 output "secondary_vnic_attachment_ids" {
