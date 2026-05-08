@@ -19,7 +19,7 @@ The rendered manifests include:
 ## Usage
 
 ```bash
-cd /Users/chipinghwang/Desktop/projects/dpdk/terraform/dpdk-nodepool-existing-cluster
+cd terraform/dpdk-nodepool-existing-cluster
 cp terraform.tfvars.example terraform.tfvars
 ```
 
@@ -31,7 +31,7 @@ Edit `terraform.tfvars` with the existing flannel cluster OCID, compartment OCID
 | --- | --- | --- | --- |
 | `region` | Yes | none | OCI region where the existing flannel OKE cluster and node-pool resources exist. |
 | `oci_profile` | No | `DEFAULT` | OCI config profile used by the Terraform OCI provider. Use `customer` for the local security-token workflow. |
-| `oci_auth` | No | `SecurityToken` | OCI provider authentication mode. Keep `SecurityToken` when using `./oci-login.sh` / OCI CLI token auth. |
+| `oci_auth` | No | `SecurityToken` | OCI provider authentication mode. Use the value that matches your OCI provider authentication method. |
 | `compartment_id` | Yes | none | Compartment OCID where the new node pool and VNIC attachments are created. |
 | `cluster_id` | Yes | none | Existing OKE cluster OCID. This stack adds a node pool to that cluster. |
 | `kubernetes_version` | Yes | none | Kubernetes version for the new node pool. It must be compatible with the existing cluster. |
@@ -58,15 +58,9 @@ Edit `terraform.tfvars` with the existing flannel cluster OCID, compartment OCID
 | `test_hugepages_2mi` | No | `512Mi` | 2Mi hugepage request and limit used by rendered validation pods. |
 | `test_hugepages_1gi` | No | `1Gi` | 1Gi hugepage size kept for templates/future tests. The current rendered smoke tests use 2Mi hugepages. |
 
-If using local OCI security-token auth, refresh first:
+Authenticate to OCI before running Terraform. For example, use your normal OCI CLI profile, API key, instance principal, or security-token workflow, then set `oci_profile` and `oci_auth` accordingly in `terraform.tfvars`.
 
-```bash
-cd /Users/chipinghwang/Desktop/projects/dpdk
-./oci-login.sh
-cd terraform/dpdk-nodepool-existing-cluster
-```
-
-Then run:
+Then run from this directory:
 
 ```bash
 terraform init
