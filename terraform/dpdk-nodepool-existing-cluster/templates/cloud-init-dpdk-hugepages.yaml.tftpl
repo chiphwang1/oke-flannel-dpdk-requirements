@@ -8,6 +8,7 @@ bootcmd:
   - [ bash, -lc, 'mountpoint -q /dev/hugepages || mount -t hugetlbfs -o pagesize=2M nodev /dev/hugepages || true' ]
   - [ bash, -lc, 'mountpoint -q /dev/hugepages-1G || mount -t hugetlbfs -o pagesize=1G nodev /dev/hugepages-1G || true' ]
 runcmd:
+  - [ bash, -lc, 'test -e /etc/.oke_init_complete || /etc/oke/oke-install.sh' ]
   - [ bash, -lc, 'sysctl --system || true' ]
   - [ bash, -lc, 'echo ${hugepages_1gi_count} > /sys/kernel/mm/hugepages/hugepages-1048576kB/nr_hugepages || true' ]
   - [ bash, -lc, 'echo ${hugepages_2mi_count} > /proc/sys/vm/nr_hugepages || true' ]
@@ -16,4 +17,4 @@ runcmd:
   - [ bash, -lc, 'grep -E "HugePages|Hugepagesize|Hugetlb" /proc/meminfo > /var/log/oke-dpdk-bootstrap/hugepages.txt || true' ]
   - [ bash, -lc, 'find /sys/kernel/mm/hugepages -maxdepth 2 -type f -name "*hugepages" -print -exec cat {} \; >> /var/log/oke-dpdk-bootstrap/hugepages.txt || true' ]
   - [ bash, -lc, 'mount | grep huge >> /var/log/oke-dpdk-bootstrap/hugepages.txt || true' ]
-  - [ bash, -lc, 'systemctl restart kubelet || true' ]
+  - [ bash, -lc, 'systemctl try-restart kubelet || true' ]

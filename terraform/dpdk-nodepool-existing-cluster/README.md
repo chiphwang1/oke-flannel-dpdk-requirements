@@ -7,7 +7,7 @@ It creates:
 - One OKE managed node pool using `FLANNEL_OVERLAY`.
 - One manually attached secondary OCI VNIC per worker instance.
 - `network_launch_type = "VFIO"` for the OKE VM SR-IOV/DPDK-capable path.
-- Cloud-init that configures 2Mi and 1Gi hugepages and restarts kubelet.
+- Cloud-init that preserves OKE worker bootstrap, configures 2Mi and 1Gi hugepages, and restarts kubelet after OKE writes its kubelet configuration.
 - Rendered Kubernetes validation manifests under `rendered-manifests/`.
 
 The rendered manifests include:
@@ -67,6 +67,8 @@ terraform init
 terraform plan
 terraform apply
 ```
+
+The custom cloud-init intentionally runs `/etc/oke/oke-install.sh` before applying the hugepage changes. Do not remove that step: on OKE worker images, it writes the OKE bootstrap state, kubelet arguments, and runtime configuration needed for the node to join the cluster.
 
 ## Validation
 
