@@ -4,6 +4,16 @@ This document lists what is required to run a DPDK workload in a pod on an OKE F
 
 It intentionally omits validation steps. Use it as a requirements and configuration reference.
 
+## Terraform
+
+A Terraform package for adding a DPDK validation node pool to an existing OKE Flannel cluster is included at:
+
+```text
+terraform/dpdk-nodepool-existing-cluster
+```
+
+It creates a `FLANNEL_OVERLAY` node pool, configures boot-time hugepages with cloud-init, manually attaches one secondary OCI VNIC per worker instance, and renders Multus `host-device` test manifests.
+
 ## Required Worker Setup
 
 The worker node must have:

@@ -1,0 +1,87 @@
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: ${hostdevice_nad}
+  namespace: ${namespace}
+spec:
+  config: |
+    {
+      "cniVersion": "0.3.1",
+      "type": "host-device",
+      "name": "${hostdevice_nad}",
+      "pciBusID": "${pci_address}",
+      "ipam": {}
+    }
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dpdk-flannel-hostdevice-test
+  namespace: ${namespace}
+  annotations:
+    k8s.v1.cni.cncf.io/networks: ${hostdevice_nad}
+spec:
+  restartPolicy: Never
+  nodeSelector:
+    ${node_label_key}: ${node_label_value}
+  tolerations:
+  - operator: Exists
+  containers:
+  - name: testpmd
+    image: docker.io/library/ubuntu:22.04
+    securityContext:
+      privileged: true
+      capabilities:
+        add: ["IPC_LOCK", "SYS_ADMIN", "NET_ADMIN", "NET_RAW"]
+    env:
+    - name: DEBIAN_FRONTEND
+      value: noninteractive
+    command:
+    - /bin/bash
+    - -lc
+    - |
+      set -uxo pipefail
+      apt-get update
+      apt-get install -y --no-install-recommends dpdk dpdk-dev iproute2 pciutils rdma-core ibverbs-providers ca-certificates
+      ip -br addr
+      grep -i Huge /proc/meminfo
+      mount | grep huge || true
+      ls -l /dev/infiniband || true
+      ibv_devices || true
+      lspci -nnk | egrep -A3 "${pci_address}|Mellanox|Ethernet" || true
+      rc=0
+      timeout 20s dpdk-testpmd \
+        -l 0-1 \
+        -a ${pci_address} \
+        --huge-dir=/dev/hugepages \
+        --socket-mem=512 \
+        --no-telemetry \
+        -- \
+        --total-num-mbufs=2048 \
+        --no-mlockall \
+        --auto-start \
+        --stats-period=1 || rc="$?"
+      echo "FLANNEL_HOSTDEVICE_DPDK_HUGEPAGES_RC=$${rc}"
+      exit 0
+    resources:
+      requests:
+        cpu: "1"
+        memory: 512Mi
+        hugepages-2Mi: ${hugepages_2mi}
+      limits:
+        cpu: "1"
+        memory: 512Mi
+        hugepages-2Mi: ${hugepages_2mi}
+    volumeMounts:
+    - name: hugepages
+      mountPath: /dev/hugepages
+    - name: infiniband
+      mountPath: /dev/infiniband
+  volumes:
+  - name: hugepages
+    emptyDir:
+      medium: HugePages-2Mi
+  - name: infiniband
+    hostPath:
+      path: /dev/infiniband
+      type: DirectoryOrCreate

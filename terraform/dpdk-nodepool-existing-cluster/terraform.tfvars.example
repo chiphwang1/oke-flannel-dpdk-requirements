@@ -1,0 +1,31 @@
+# Copy to terraform.tfvars and replace all OCIDs/values before running terraform plan.
+
+region      = "us-ashburn-1"
+oci_profile = "customer"
+oci_auth    = "SecurityToken"
+
+compartment_id     = "ocid1.compartment.oc1..replace_me"
+cluster_id         = "ocid1.cluster.oc1.iad.replace_me"
+kubernetes_version = "v1.35.2"
+
+node_pool_name = "dpdk-hugepages"
+node_count     = 1
+node_shape     = "VM.Standard.E5.Flex"
+ocpus          = 4
+memory_in_gbs  = 32
+node_image_id  = "ocid1.image.oc1.iad.replace_me"
+ssh_public_key = "ssh-rsa AAAA... replace_me"
+
+placement_configs = [
+  {
+    availability_domain = "replace:US-ASHBURN-AD-1"
+    subnet_id           = "ocid1.subnet.oc1.iad.node_subnet_replace_me"
+  }
+]
+
+attach_secondary_vnic     = true
+secondary_vnic_subnet_id  = "ocid1.subnet.oc1.iad.secondary_vnic_subnet_replace_me"
+secondary_vnic_assign_public_ip = false
+
+test_namespace   = "dpdk-validation"
+test_pci_address = "0000:01:00.0"
