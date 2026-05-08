@@ -128,6 +128,5 @@ Before applying the Multus test, make sure Multus is installed in the cluster an
 - This package is additive: it only creates a new node pool and local rendered manifest files.
 - The test manifests are not applied by Terraform.
 - The node pool intentionally uses `FLANNEL_OVERLAY` only.
-- The secondary VNIC is attached with `oci_core_vnic_attachment`, not OKE GVA.
 - The `test_pci_address` value is environment-specific. Confirm with `lspci -nnk` or `dpdk-devbind.py -s` on the new node before applying PCI tests.
 - For the Mellanox `mlx5_core` path, the key pod evidence is flannel `eth0`, Multus `net1`, hugepages, `/dev/infiniband`, `ibv_devices`, and `dpdk-testpmd -a <PCI_BDF>`.
